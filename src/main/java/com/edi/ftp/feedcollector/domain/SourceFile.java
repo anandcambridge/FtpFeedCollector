@@ -2,10 +2,12 @@ package com.edi.ftp.feedcollector.domain;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class SourceFile {
@@ -14,7 +16,8 @@ public class SourceFile {
     private Integer id;
 
     private String fileName;
-    private int status;
+	@ManyToOne(cascade=CascadeType.DETACH)
+    private SourceStatus sourceStatus;
     private double fileSize;
     private String fileSource;
     private String supplier;
@@ -34,11 +37,11 @@ public class SourceFile {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public int getStatus() {
-		return status;
+	public SourceStatus getSourceStatus() {
+		return sourceStatus;
 	}
-	public void setStatus(int status) {
-		this.status = status;
+	public void setSourceStatus(SourceStatus sourceStatus) {
+		this.sourceStatus = sourceStatus;
 	}
 	public double getFileSize() {
 		return fileSize;

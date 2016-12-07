@@ -17,10 +17,13 @@ import org.springframework.stereotype.Service;
 
 import com.edi.ftp.feedcollector.domain.SourceFile;
 import com.edi.ftp.feedcollector.repositories.SourceFileRepository;
+import com.edi.ftp.feedcollector.repositories.SourceStatusRepository;
 
 @Service
 public class LocalFeedCollector implements Runnable {
+	private static final String PROCESS1_STARTED = "PROCESS1_STARTED";
 	private static SourceFileRepository sourceFileRepository;
+	private static SourceStatusRepository sourceStatusRepository;
 	List<SourceFile> sourceFileLst = new ArrayList<>();
 	Map<String, SourceFile> sourceFileMap;
 
@@ -29,6 +32,10 @@ public class LocalFeedCollector implements Runnable {
 		LocalFeedCollector.sourceFileRepository = sourceFileRepository;
 	}
 
+	@Autowired
+	public void setSourceStatusRepository(SourceStatusRepository sourceStatusRepository) {
+		LocalFeedCollector.sourceStatusRepository = sourceStatusRepository;
+	}
 	
 	@Override
 	public void run() {
@@ -68,6 +75,7 @@ public class LocalFeedCollector implements Runnable {
 			SourceFile sourceFile = new SourceFile();
 			sourceFile.setFileName(k);
 			sourceFile.setSupplier("MSTAR");
+			sourceFile.setSourceStatus(sourceStatusRepository.findByDescription(PROCESS1_STARTED));
 			sourceFileRepository.save(sourceFile);
 		}
 		} catch (Exception e) {
