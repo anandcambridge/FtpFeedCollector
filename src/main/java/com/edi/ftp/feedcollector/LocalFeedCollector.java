@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,40 +13,40 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.edi.ftp.feedcollector.domain.SourceFile;
 import com.edi.ftp.feedcollector.repositories.SourceFileRepository;
 import com.edi.ftp.feedcollector.repositories.SourceStatusRepository;
 
-@Service
-public class LocalFeedCollector implements Runnable {
+@Component
+public class LocalFeedCollector {
 	private static final String PROCESS1_STARTED = "PROCESS1_STARTED";
-	private static SourceFileRepository sourceFileRepository;
-	private static SourceStatusRepository sourceStatusRepository;
+	private SourceFileRepository sourceFileRepository;
+	private SourceStatusRepository sourceStatusRepository;
 	List<SourceFile> sourceFileLst = new ArrayList<>();
 	Map<String, SourceFile> sourceFileMap;
+    private static final Logger log = LoggerFactory.getLogger(LocalFeedCollector.class);
 
 	@Autowired
 	public void setSourceFileRepository(SourceFileRepository sourceFileRepository) {
-		LocalFeedCollector.sourceFileRepository = sourceFileRepository;
+		this.sourceFileRepository = sourceFileRepository;
 	}
 
 	@Autowired
 	public void setSourceStatusRepository(SourceStatusRepository sourceStatusRepository) {
-		LocalFeedCollector.sourceStatusRepository = sourceStatusRepository;
+		this.sourceStatusRepository = sourceStatusRepository;
 	}
-	
-	@Override
+    
+    @Scheduled(cron = "${local.feed.schedule.cron}")
 	public void run() {
-//		List<File> filesInFolder = null;
+		System.out.println("***run starts" + LocalDateTime.now().toString());
 		Map<String, File> filesInFolder = null;
 		try {
-//			filesInFolder = Files.walk(Paths.get("C:/temp/edi/rawfile/from"))
-//			        .filter(Files::isRegularFile)
-//			        .map(Path::toFile)
-//			        .collect(Collectors.toList());
 
 			filesInFolder = Files.walk(Paths.get("C:/temp/edi/rawfile/from"))
 	        .filter(Files::isRegularFile)
