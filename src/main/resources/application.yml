@@ -1,0 +1,10 @@
+filecollection:
+ ftpconfiguration:
+  mstarconfig:
+   localdrive: cDrive
+   remotedrive: dDrive
+   cron.scheduler: 1/2 * * * * ?
+  bombayconfig:
+   localdrive: 123Drive
+   remotedrive: 321Drive
+   cron.scheduler: 1/5 * * * * ?     

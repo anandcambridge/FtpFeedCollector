@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +27,13 @@ import com.edi.ftp.feedcollector.repositories.SourceFileRepository;
 import com.edi.ftp.feedcollector.repositories.SourceStatusRepository;
 
 @Component
-public class LocalFeedCollector {
+public class LocalFeedCollectorJob implements Job {
 	private static final String PROCESS1_STARTED = "PROCESS1_STARTED";
 	private SourceFileRepository sourceFileRepository;
 	private SourceStatusRepository sourceStatusRepository;
 	List<SourceFile> sourceFileLst = new ArrayList<>();
 	Map<String, SourceFile> sourceFileMap;
-    private static final Logger log = LoggerFactory.getLogger(LocalFeedCollector.class);
+    private static final Logger log = LoggerFactory.getLogger(LocalFeedCollectorJob.class);
 
 	@Autowired
 	public void setSourceFileRepository(SourceFileRepository sourceFileRepository) {
@@ -41,9 +45,13 @@ public class LocalFeedCollector {
 		this.sourceStatusRepository = sourceStatusRepository;
 	}
     
-//    @Scheduled(cron = "${local.feed.schedule.cron}")
-	public void run() {
+	@Override
+	public void execute(JobExecutionContext context)
+			throws JobExecutionException {
 		System.out.println("***run starts" + LocalDateTime.now().toString());
+		JobDataMap mergedJobDataMap = context.getMergedJobDataMap();
+		Map<String, String> configMap = (Map<String, String>) mergedJobDataMap.get(mergedJobDataMap.getKeys()[0]);
+		String remoteFilePath = configMap.get("remotedrive");
 		Map<String, File> filesInFolder = null;
 		try {
 
